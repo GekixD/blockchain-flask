@@ -2,11 +2,15 @@ from sympy import prime
 from functools import reduce
 from typing import List
 from src.config.config import BLOCKCHAIN_CONFIG
+from src.utils.logger import setup_logger
+
+logger = setup_logger('blockchain.hashing')
 
 config = BLOCKCHAIN_CONFIG['HASH_CONFIG']
 
 
 def get_dynamic_primes(s: str) -> List[int]:
+    logger.debug(f"Processing input of length {len(s)}")
     n = len(s) ** config.get('size_exponent', 5) % config.get('prime_limit', 9999999)
     if n == 0:
         return [2]
@@ -30,4 +34,5 @@ def standardize_hash_value(value: int) -> str:
 
 
 def hashing_algorithm(input_string: str) -> str:
+    logger.info("Processing hash calculation")
     return standardize_hash_value(calculate_hash(get_dynamic_primes(input_string), get_ord_sum(input_string)))
