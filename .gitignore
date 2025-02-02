@@ -25,7 +25,7 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-todos_list.txt
+src/todo_list.txt
 
 
 # Virtual Environment
