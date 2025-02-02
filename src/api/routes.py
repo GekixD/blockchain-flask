@@ -3,9 +3,11 @@ from src.blockchain.blockchain import Blockchain
 from src.blockchain.helpers import make_response, validate_fields, hash_block
 from src.config.config import BLOCKCHAIN_CONFIG, LOGGING_CONFIG
 from src.utils.logger import setup_logger   
+from src.utils.middleware import log_requests
+import datetime
 
 config = BLOCKCHAIN_CONFIG
-logger = setup_logger('api') # TODO: set up logger for all routes 
+logger = setup_logger('api.routes') # TODO: set up logger for all routes 
 
 # Creating a Flask Blueprint for routing
 routes = Blueprint('routes', __name__)
@@ -16,7 +18,9 @@ blockchain = Blockchain()
 
 # Mine a block
 @routes.route('/mine_block', methods=['POST'])
+@log_requests
 def mine_block():
+    logger.info("Processing mine_block request")
     try:
         # getting miner info:
         request_data = request.get_json()
@@ -42,8 +46,10 @@ def mine_block():
         data = block
         
         blockchain.save_chain()
+        logger.info(f"Block {block['index']} mined successfully")
         return make_response(message, 200, data)
     except Exception as e:
+        logger.error(f"Error mining block: {str(e)}")
         return make_response(f'Error while mining block: {str(e)}', 500)
 
 
@@ -178,3 +184,16 @@ def broadcast_transaction():
             response = make_response(message, 400)
     blockchain.save_chain()
     return response
+
+
+@routes.route('/health', methods=['GET'])
+@log_requests
+def health_check():
+    logger.debug("Health check requested")
+    message = "Service is healthy"
+    data = {
+        'status': 'healthy',
+        'timestamp': str(datetime.datetime.now())
+    }
+    return make_response(message, 200, data)
+

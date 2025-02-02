@@ -8,7 +8,7 @@ from src.config.config import BLOCKCHAIN_CONFIG
 from src.blockchain.helpers import hash_block
 
 config = BLOCKCHAIN_CONFIG
-logger = setup_logger('blockchain')
+logger = setup_logger('blockchain.core')
 
 # Building a Blockchain
 class Blockchain:
@@ -80,17 +80,22 @@ class Blockchain:
         return False
 
     def create_block(self, proof, prev_hash):
-        block = {
-            'index': len(self.chain) + 1,
-            'timestamp': str(datetime.datetime.now()),
-            'transactions': self.mempool,
-            'proof': proof,
-            'prev_hash': prev_hash
-        }
-        self.mempool = []
-        self.chain.append(block)
-        logger.info(f"Created new block {block['index']}")
-        return block
+        logger.info(f"Creating new block with proof: {proof}")
+        try:
+            block = {
+                'index': len(self.chain) + 1,
+                'timestamp': str(datetime.datetime.now()),
+                'transactions': self.mempool,
+                'proof': proof,
+                'prev_hash': prev_hash
+            }
+            self.mempool = []
+            self.chain.append(block)
+            logger.info(f"Block {block['index']} created successfully")
+            return block
+        except Exception as e:
+            logger.error(f"Error creating block: {str(e)}")
+            raise
 
     def get_prev_block(self):
         logger.debug("Getting previous block")

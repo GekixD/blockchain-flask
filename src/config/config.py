@@ -1,26 +1,26 @@
 import logging
 
 LOGGING_CONFIG = {
-    'LOG_LEVEL': logging.INFO,
     'LOG_FORMAT': '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     'LOG_DIR': 'logs',
     'MAX_LOG_SIZE': 10 * 1024 * 1024,
     'BACKUP_COUNT': 5,
-    'COMPONENTS': {
-        'blockchain': {
-            'level': logging.INFO,
-            'filename': 'blockchain.log'
-        },
+    'LOGGERS': {
         'api': {
             'level': logging.INFO,
-            'filename': 'api.log'
+            'file': 'api.log'
         },
-        'server': {
+        'blockchain': {
             'level': logging.INFO,
-            'filename': 'server.log'
+            'file': 'blockchain.log'
+        },
+        'application': {
+            'level': logging.INFO,
+            'file': 'application.log'
         }
     }
 }
+
 
 BLOCKCHAIN_CONFIG = {
     # Mining settings

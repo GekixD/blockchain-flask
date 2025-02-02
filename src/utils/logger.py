@@ -1,36 +1,44 @@
 import logging
 import os
 from logging.handlers import RotatingFileHandler
-from src.config import LOGGING_CONFIG
+from src.config.config import LOGGING_CONFIG
 
-def setup_logger(name, log_level=logging.INFO):
-    log_format = LOGGING_CONFIG['LOG_FORMAT']
+def setup_logger(name):
+    # Determine the base category from the name
+    base_category = name.split('.')[0]
+    
+    # Get logger config based on category, default to 'application'
+    logger_config = LOGGING_CONFIG['LOGGERS'].get(
+        base_category, 
+        LOGGING_CONFIG['LOGGERS']['application']
+    )
+    
     logger = logging.getLogger(name)
-    logger.setLevel(log_level)
-
+    logger.setLevel(logger_config['level'])
+    
+    # Clear existing handlers
     if logger.handlers:
         logger.handlers.clear()
 
     # Create formatter
-    file_formatter = logging.Formatter(log_format)
-    console_formatter = logging.Formatter(log_format)
+    formatter = logging.Formatter(LOGGING_CONFIG['LOG_FORMAT'])
     
-    # File handler
+    # Ensure log directory exists
     if not os.path.exists(LOGGING_CONFIG['LOG_DIR']):
         os.makedirs(LOGGING_CONFIG['LOG_DIR'])
+    
+    # File handler
     fh = RotatingFileHandler(
-        f'{LOGGING_CONFIG["LOG_DIR"]}/{name}.log', 
-        maxBytes=LOGGING_CONFIG['MAX_LOG_SIZE'], 
+        f"{LOGGING_CONFIG['LOG_DIR']}/{logger_config['file']}", 
+        maxBytes=LOGGING_CONFIG['MAX_LOG_SIZE'],
         backupCount=LOGGING_CONFIG['BACKUP_COUNT']
     )
-    fh.setFormatter(file_formatter)
-    fh.setLevel(log_level)
+    fh.setFormatter(formatter)
     logger.addHandler(fh)
     
     # Console handler
     ch = logging.StreamHandler()
-    ch.setFormatter(console_formatter)
-    ch.setLevel(log_level)
+    ch.setFormatter(formatter)
     logger.addHandler(ch)
     
     return logger 

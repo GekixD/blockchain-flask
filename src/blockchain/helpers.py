@@ -2,6 +2,9 @@ import datetime
 import hashlib
 import json
 from flask import jsonify
+from src.utils.logger import setup_logger
+
+logger = setup_logger('blockchain.helpers')
 
 
 def validate_fields(data, required_fields):
@@ -22,6 +25,11 @@ def make_response(message, status_code, data=None):
     return jsonify(response), status_code
 
 
-def hash_block(data):
-    encoded_block = json.dumps(data, sort_keys=True).encode()
-    return hashlib.sha256(encoded_block).hexdigest()
+def hash_block(block):
+    logger.debug(f"Hashing block {block.get('index', 'unknown')}")
+    try:
+        encoded_block = json.dumps(block, sort_keys=True).encode()
+        return hashlib.sha256(encoded_block).hexdigest()
+    except Exception as e:
+        logger.error(f"Error hashing block: {str(e)}")
+        raise
