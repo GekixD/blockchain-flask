@@ -25,6 +25,8 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+todos_list.txt
+
 
 # Virtual Environment
 venv/
