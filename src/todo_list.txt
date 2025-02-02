@@ -1,4 +1,0 @@
-TODO: set up logger for all routes 
-TODO: find if broadcast transaction endpoint is really needed or can be merged with add_transaction
-TODO: Implement a method to adjust the difficulty based on average mining time
-TODO: make a better PoW proof for mining (see hashing.py)
