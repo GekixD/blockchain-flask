@@ -203,3 +203,26 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 Contact
 
 Project Link: [https://github.com/GekixD/blockchain-flask](https://github.com/GekixD/blockchain-flask)
+
+## 🔄 Updates
+
+### Version 0.2.0 (2025-02-03)
+
+#### Type System Implementation
+- Added comprehensive static type hints across the codebase
+- Enhanced function signatures and class attributes with type annotations
+- Improved code reliability through static type checking (mypy compatible)
+
+#### Smart Contract Implementation (Beta)
+- Added basic smart contract functionality:
+  - Sandboxed execution environment with timeout mechanism
+  - Gas tracking and usage monitoring
+  - Security features (AST validation, operation blacklist)
+  - Restricted blockchain interface
+  
+#### Known Limitations
+- Smart contract functionality requires:
+  - Testing suite
+  - Gas optimization
+  - Enhanced security measures
+  - Extended blockchain interface

@@ -1,9 +1,11 @@
 import logging
 import os
+from typing import Any
+from logging import Logger
 from logging.handlers import RotatingFileHandler
 from src.config.config import LOGGING_CONFIG
 
-def setup_logger(name):
+def setup_logger(name: str) -> Logger:
     # Determine the base category from the name
     base_category = name.split('.')[0]
     

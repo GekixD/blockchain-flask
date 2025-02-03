@@ -1,6 +1,7 @@
 import logging
+from typing import Dict, Any
 
-LOGGING_CONFIG = {
+LOGGING_CONFIG: Dict[str, Any] = {
     'LOG_FORMAT': '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     'LOG_DIR': 'logs',
     'MAX_LOG_SIZE': 10 * 1024 * 1024,
@@ -22,7 +23,7 @@ LOGGING_CONFIG = {
 }
 
 
-BLOCKCHAIN_CONFIG = {
+BLOCKCHAIN_CONFIG: Dict[str, Any] = {
     # Mining settings
     'DIFFICULTY': 4,
     'BLOCK_REWARD': 1.0,

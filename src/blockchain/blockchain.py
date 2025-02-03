@@ -1,3 +1,4 @@
+from typing import List, Set, Dict, Any, Optional, Union
 import datetime
 import hashlib
 import json
@@ -6,6 +7,7 @@ from urllib.parse import urlparse
 from src.utils.logger import setup_logger
 from src.config.config import BLOCKCHAIN_CONFIG
 from src.blockchain.helpers import hash_block
+from src.blockchain.contract import SmartContract
 
 config = BLOCKCHAIN_CONFIG
 logger = setup_logger('blockchain.core')
@@ -13,16 +15,17 @@ logger = setup_logger('blockchain.core')
 # Building a Blockchain
 class Blockchain:
 
-    def __init__(self):
+    def __init__(self) -> None:
         logger.info("Initializing new blockchain")
-        self.chain = []
-        self.mempool = []
-        self.processed_transactions = set()
-        self.nodes = set()
+        self.chain: List[Dict[str, Any]] = []
+        self.mempool: List[Dict[str, Any]] = []
+        self.processed_transactions: Set[str] = set()
+        self.nodes: Set[str] = set()
+        self.contracts: Dict[str, SmartContract] = {}
         self.create_block(proof=1, prev_hash='0' * config['DIFFICULTY'])
-        self.gas_fee = config['GAS_FEE']
+        self.gas_fee: float = config['GAS_FEE']
 
-    def save_chain(self, filename=config['CHAIN_FILE']):
+    def save_chain(self, filename: str = config['CHAIN_FILE']) -> None:
         try:
             with open(filename, 'w') as file:
                 state = {
@@ -37,7 +40,7 @@ class Blockchain:
             logger.error(f"Error saving chain: {str(e)}")
             raise
 
-    def load_chain(self, filename=config['CHAIN_FILE']):
+    def load_chain(self, filename: str = config['CHAIN_FILE']) -> bool:
         try:
             with open(filename, 'r') as file:
                 state = json.load(file)
@@ -51,12 +54,12 @@ class Blockchain:
             logger.warning('Nonexistent blockchain.')
             return False
 
-    def add_node(self, address):
+    def add_node(self, address: str) -> None:
         parsed_url = urlparse(address)
         self.nodes.add(parsed_url.netloc)
         logger.info(f"Added new node: {parsed_url.netloc}")
 
-    def replace_chain(self):
+    def replace_chain(self) -> bool:
         longest_chain = None
         max_len = len(self.chain)
 
@@ -79,7 +82,7 @@ class Blockchain:
         logger.info("Chain replacement not needed - current chain is longest")
         return False
 
-    def create_block(self, proof, prev_hash):
+    def create_block(self, proof: int, prev_hash: str) -> Dict[str, Any]:
         logger.info(f"Creating new block with proof: {proof}")
         try:
             block = {
@@ -97,11 +100,11 @@ class Blockchain:
             logger.error(f"Error creating block: {str(e)}")
             raise
 
-    def get_prev_block(self):
+    def get_prev_block(self) -> Dict[str, Any]:
         logger.debug("Getting previous block")
         return self.chain[-1]
 
-    def get_user_balance(self, user):
+    def get_user_balance(self, user: str) -> float:
         balance = 0
         for block in self.chain:
             for transaction in block.get('transactions', []):
@@ -112,7 +115,7 @@ class Blockchain:
         logger.info(f"Calculated balance for user {user}: {balance}")
         return balance
 
-    def add_transaction(self, sender, receiver, amount):
+    def add_transaction(self, sender: str, receiver: str, amount: float) -> Union[bool, int]:
         if amount <= 0:
             logger.error("Invalid transaction: amount must be positive")
             raise ValueError('Transaction amount must be positive')
@@ -132,7 +135,7 @@ class Blockchain:
         logger.info(f"Added transaction: {sender} -> {receiver}, amount: {amount}")
         return self.get_prev_block()['index'] + 1
 
-    def broadcast_transaction(self, transaction):
+    def broadcast_transaction(self, transaction: Dict[str, Any]) -> None:
         for node in self.nodes:
             try:
                 response = requests.post(f'http://{node}/add_transaction', json=transaction, timeout=config['NODE_TIMEOUT'])
@@ -141,7 +144,7 @@ class Blockchain:
             except requests.exceptions.RequestException:
                 logger.error(f'Could not connect to node: {node}')
 
-    def proof_of_work(self, prev_proof=None, difficulty=config['DIFFICULTY']):
+    def proof_of_work(self, prev_proof: Optional[int] = None, difficulty: int = config['DIFFICULTY']) -> int:
         logger.info("Starting proof of work calculation")
         # TODO: Implement a method to adjust the difficulty based on average mining time
         if prev_proof is None:
@@ -156,7 +159,7 @@ class Blockchain:
                 return new_proof
             new_proof += 1
 
-    def is_chain_valid(self, chain=None):
+    def is_chain_valid(self, chain: Optional[List[Dict[str, Any]]] = None) -> bool:
         logger.info("Validating blockchain")
         if chain is None:
             chain = self.chain
@@ -178,7 +181,7 @@ class Blockchain:
         logger.info("Chain validation successful")
         return True
 
-    def execute_smart_contract(self, contract_code, params):
+    def execute_smart_contract(self, contract_code: str, params: Dict[str, Any]) -> Optional[Any]:
         try:
             logger.info("Executing smart contract")
             exec(contract_code, {}, params)

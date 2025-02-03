@@ -1,9 +1,10 @@
+from typing import NoReturn
 from src.utils.logger import setup_logger
 from src.config import LOGGING_CONFIG
 
 logger = setup_logger('config')
 
-def validate_config():
+def validate_config() -> None:
     logger.info("Validating configuration...")
     required_keys = ['LOG_FORMAT', 'LOG_DIR', 'MAX_LOG_SIZE', 'BACKUP_COUNT']
     
